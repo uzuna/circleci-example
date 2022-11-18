@@ -5,6 +5,14 @@ executors:
     docker:
       - image: cimg/base:current-20.04
 
+commands:
+  check-cwd:
+    steps:
+      - run:
+          name: show cdw
+          command: |
+            pwd
+            ls -la
 jobs:
   showinfo:
     executor: default
@@ -18,6 +26,7 @@ jobs:
       - run:
           name: Generate file
           command: make generate
+      - check-cwd
       - save_cache:
           key: store-{{ .Branch }}
           paths:
@@ -28,14 +37,14 @@ jobs:
       - checkout
       - restore_cache:
           key: store-{{ .Branch }}
-      - run: ls -la 
+      - check-cwd
       - run:
           name: check cache file
           command: make check
 
 workflows:
   version: 2
-  w1:
+  cache-control:
     jobs:
       - showinfo
       - job_store_cache
