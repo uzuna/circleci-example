@@ -5,29 +5,68 @@ executors:
     docker:
       - image: cimg/base:current-20.04
 
+commands:
+  check-cwd:
+    steps:
+      - run:
+          name: show current working directory
+          command: |
+            pwd
+            ls -la
 jobs:
-  job1:
+  showinfo:
     executor: default
     steps:
       - checkout
-      - run: echo "This is pipeline ID << pipeline.id >>"
-      - run: echo $CIRCLE_COMPARE_URL
-      - run: echo $CIRCLE_WORKFLOW_ID
-      - run: echo $CIRCLE_JOB
-  job2:
+      - run: echo "This job is << pipeline.id >> $CIRCLE_JOB"
+  job_store_cache_in_workflow:
     executor: default
     steps:
       - checkout
-      - run: echo "This is pipeline ID << pipeline.id >>"
-      - run: echo $CIRCLE_COMPARE_URL
-      - run: echo $CIRCLE_WORKFLOW_ID
-      - run: echo $CIRCLE_JOB
+      - run:
+          name: Generate file
+          command: |
+            make generate
+            make log VALUE=<< pipeline.id >>-<< pipeline.git.branch >>-<< pipeline.schedule.name >>-<< pipeline.trigger_source >>
+      - check-cwd
+      - save_cache:
+          # Branch毎 + 各CIワークフロー毎に生成
+          key: store-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - dist
+  job_restore_cache_in_workflow:
+    executor: default
+    steps:
+      - checkout
+      - restore_cache:
+          key: store-{{ .Branch }}-{{ .Revision }}
+      - check-cwd
+      - run:
+          name: check cache file
+          command: |
+            make check
+            make show-log
+    
+  job_restore_cache_any:
+    executor: default
+    steps:
+      - checkout
+      - restore_cache:
+          key: store-{{ .Branch }}-
+      - check-cwd
+      - run:
+          name: show log
+          command: make show-log
 
 workflows:
   version: 2
-  w1:
+  cache-control-in-workflow:
     jobs:
-      - job1
-      - job2:
+      - showinfo
+      - job_store_cache_in_workflow
+      - job_restore_cache_in_workflow:
           requires:
-            - job1
+            - job_store_cache_in_workflow
+  cache-restore-previous-run:
+    jobs:
+      - job_restore_cache_any
