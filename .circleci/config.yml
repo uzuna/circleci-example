@@ -45,7 +45,7 @@ jobs:
           name: check cache file
           command: |
             make check
-            show-log
+            make show-log
     
   job_restore_cache_any:
     executor: default
@@ -56,7 +56,7 @@ jobs:
       - check-cwd
       - run:
           name: show log
-          command: show-log
+          command: make show-log
 
 workflows:
   version: 2
