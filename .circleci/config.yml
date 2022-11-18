@@ -28,7 +28,7 @@ jobs:
           command: make generate
       - check-cwd
       - save_cache:
-          key: store-{{ .Branch }}
+          key: store-{{ .Branch }}-{{ .BuildNum }}
           paths:
             - dist
   job_restore_cache:
@@ -36,7 +36,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: store-{{ .Branch }}
+          key: store-{{ .Branch }}-{{ .BuildNum }}
       - check-cwd
       - run:
           name: check cache file
