@@ -1,0 +1,24 @@
+version: 2.1
+
+executors:
+  default:
+    docker: 
+      - image: cimg/base
+
+jobs:
+  job1:
+    executor: default
+    steps:
+      - checkout
+      - run: echo "This is pipeline ID << pipeline.id >>"
+      - run: echo $CIRCLE_COMPARE_URL
+      - run: echo $CIRCLE_WORKFLOW_ID
+      - run: echo $CIRCLE_JOB
+  job2:
+    executor: default
+    steps:
+      - checkout
+      - run: echo "This is pipeline ID << pipeline.id >>"
+      - run: echo $CIRCLE_COMPARE_URL
+      - run: echo $CIRCLE_WORKFLOW_ID
+      - run: echo $CIRCLE_JOB
