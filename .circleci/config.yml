@@ -107,6 +107,7 @@ workflows:
       - job_restore_workspace:
           requires:
             - job_store_workspace
+  # featureブランチのときだけrun-approvalがでて、依存するshowinfoが実行まちになる
   approve-only-feature:
     jobs:
       - run-approval:
@@ -118,6 +119,7 @@ workflows:
       - showinfo:
           requires:
             - run-approval
+  # featureブランチのときにはこのworkflow自体が消える
   approve-ignore-feature:
     jobs:
       - run-approval:
@@ -129,6 +131,7 @@ workflows:
       - showinfo:
           requires:
             - run-approval
+  # featureか否かでどちらかのjobだけが実行される
   branch-filter-feature:
     jobs:
       - showinfo:
@@ -143,6 +146,8 @@ workflows:
             branches:
               ignore:
                 - /feature\/.*/
+  # tagが付いてるコミットの場合でだけ実行される
+  # デフォルトの場合push時にはtag付与がないので実行されることはない
   tag-filter-feature:
     jobs:
       - showinfo:
