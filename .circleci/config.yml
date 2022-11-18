@@ -10,24 +10,15 @@ jobs:
     executor: default
     steps:
       - checkout
-      - run: echo "This is pipeline ID << pipeline.id >>"
-      - run: echo $CIRCLE_COMPARE_URL
-      - run: echo $CIRCLE_WORKFLOW_ID
-      - run: echo $CIRCLE_JOB
+      - run: echo "This is job is pipeline << pipeline.id >>, job $CIRCLE_JOB"
   job2:
     executor: default
     steps:
       - checkout
-      - run: echo "This is pipeline ID << pipeline.id >>"
-      - run: echo $CIRCLE_COMPARE_URL
-      - run: echo $CIRCLE_WORKFLOW_ID
-      - run: echo $CIRCLE_JOB
+      - run: echo "This is job is pipeline << pipeline.id >>, job $CIRCLE_JOB"
 
 workflows:
   version: 2
   w1:
     jobs:
       - job1
-      - job2:
-          requires:
-            - job1
