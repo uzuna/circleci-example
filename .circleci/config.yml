@@ -16,9 +16,13 @@ commands:
 jobs:
   showinfo:
     executor: default
+    parameters:
+      title:
+        type: string
+        default: showinfo
     steps:
       - checkout
-      - run: echo "This job is << pipeline.id >> $CIRCLE_JOB"
+      - run: echo "This job [<< parameters.title >>] at << pipeline.id >> $CIRCLE_JOB"
   job_store_cache_in_workflow:
     executor: default
     steps:
@@ -103,6 +107,15 @@ workflows:
       - job_restore_workspace:
           requires:
             - job_store_workspace
+  approve-only-feature:
+    jobs:
+      - run-approval:
+          type: approval
+          filters:
+            branches:
+              only:
+                - /feature\/.*/
+      - showinfo
   approve-ignore-feature:
     jobs:
       - run-approval:
@@ -115,14 +128,28 @@ workflows:
   branch-filter-feature:
     jobs:
       - showinfo:
+          title: branch-only-feature
           filters:
             branches:
               only:
                 - /feature\/.*/
+      - showinfo:
+          title: branch-ignore-feature
+          filters:
+            branches:
+              ignore:
+                - /feature\/.*/
   tag-filter-feature:
     jobs:
       - showinfo:
+          title: tag-only-test
           filters:
             tags:
               only:
+                - /test\/.*/
+      - showinfo:
+          title: tag-ignore-test
+          filters:
+            tags:
+              ignore:
                 - /test\/.*/
