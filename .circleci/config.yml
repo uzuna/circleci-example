@@ -103,3 +103,26 @@ workflows:
       - job_restore_workspace:
           requires:
             - job_store_workspace
+  approve-ignore-feature:
+    jobs:
+      - run-approval:
+          type: approval
+          filters:
+            branches:
+              ignore:
+                - /feature\/.*/
+      - showinfo
+  branch-filter-feature:
+    jobs:
+      - showinfo:
+          filters:
+            branches:
+              only:
+                - /feature\/.*/
+  tag-filter-feature:
+    jobs:
+      - showinfo:
+          filters:
+            tags:
+              only:
+                - /test\/.*/
