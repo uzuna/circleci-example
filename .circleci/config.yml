@@ -57,6 +57,33 @@ jobs:
       - run:
           name: show log
           command: make show-log
+  
+  job_store_workspace:
+    executor: default
+    steps:
+      - checkout
+      - run:
+          name: Generate file
+          command: |
+            make generate
+            make log VALUE=<< pipeline.id >>-<< pipeline.git.branch >>-<< pipeline.schedule.name >>-<< pipeline.trigger_source >>
+      - check-cwd
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+
+  job_restore_workspace:
+    executor: default
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - check-cwd
+      - run:
+          name: show log
+          command: make show-log
+
 
 workflows:
   version: 2
@@ -70,3 +97,9 @@ workflows:
   cache-restore-previous-run:
     jobs:
       - job_restore_cache_any
+  workspace:
+    jobs:
+      - job_store_workspace
+      - job_restore_workspace:
+          requires:
+            - job_store_workspace
