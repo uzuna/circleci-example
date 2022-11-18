@@ -27,7 +27,7 @@ jobs:
           name: Generate file
           command: |
             make generate
-            make log VALUE={{ arch }}-{{ .Branch }}-{{ .BuildNum }}-{{ .Revision }} 
+            make log VALUE=<< pipeline.id >>-<< pipeline.git.branch >>-<<pipeline.schedule.name>>
       - check-cwd
       - save_cache:
           # Branch毎 + 各CIワークフロー毎に生成
