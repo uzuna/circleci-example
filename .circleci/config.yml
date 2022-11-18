@@ -52,7 +52,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: store-{{ .Branch }}
+          key: store-{{ .Branch }}-
       - check-cwd
       - run:
           name: show log
