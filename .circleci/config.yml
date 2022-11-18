@@ -9,7 +9,7 @@ commands:
   check-cwd:
     steps:
       - run:
-          name: show cdw
+          name: show current working directory
           command: |
             pwd
             ls -la
@@ -19,19 +19,22 @@ jobs:
     steps:
       - checkout
       - run: echo "This job is << pipeline.id >> $CIRCLE_JOB"
-  job_store_cache:
+  job_store_cache_in_workflow:
     executor: default
     steps:
       - checkout
       - run:
           name: Generate file
-          command: make generate
+          command: |
+            make generate
+            make log VALUE={{ arch }}-{{ .Branch }}-{{ .BuildNum }}-{{ .Revision }} 
       - check-cwd
       - save_cache:
+          # Branch毎 + 各CIワークフロー毎に生成
           key: store-{{ .Branch }}-{{ .Revision }}
           paths:
             - dist
-  job_restore_cache:
+  job_restore_cache_in_workflow:
     executor: default
     steps:
       - checkout
@@ -40,14 +43,30 @@ jobs:
       - check-cwd
       - run:
           name: check cache file
-          command: make check
+          command: |
+            make check
+            show-log
+    
+  job_restore_cache_any:
+    executor: default
+    steps:
+      - checkout
+      - restore_cache:
+          key: store-{{ .Branch }}
+      - check-cwd
+      - run:
+          name: show log
+          command: show-log
 
 workflows:
   version: 2
   cache-control:
     jobs:
       - showinfo
-      - job_store_cache
-      - job_restore_cache:
+      - job_store_cache_in_workflow
+      - job_restore_cache_in_workflow:
           requires:
             - job_store_cache
+  cache-restore-previous:
+    jobs:
+      - job_restore_cache_any
