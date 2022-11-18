@@ -6,28 +6,38 @@ executors:
       - image: cimg/base:current-20.04
 
 jobs:
-  job1:
+  showinfo:
     executor: default
     steps:
       - checkout
-      - run: echo "This is pipeline ID << pipeline.id >>"
-      - run: echo $CIRCLE_COMPARE_URL
-      - run: echo $CIRCLE_WORKFLOW_ID
-      - run: echo $CIRCLE_JOB
-  job2:
+      - run: echo "This job is << pipeline.id >> $CIRCLE_JOB"
+  job_store_cache:
     executor: default
     steps:
       - checkout
-      - run: echo "This is pipeline ID << pipeline.id >>"
-      - run: echo $CIRCLE_COMPARE_URL
-      - run: echo $CIRCLE_WORKFLOW_ID
-      - run: echo $CIRCLE_JOB
+      - run:
+          name: Generate file
+          command: make generate
+      - save_cache:
+          key: store-{{ .Branch }}
+          paths:
+            - dist/*
+  job_restore_cache:
+    executor: default
+    steps:
+      - checkout
+      - restore_cache:
+          key: store-{{ .Branch }}
+      - run:
+          name: check cache file
+          command: make check
 
 workflows:
   version: 2
   w1:
     jobs:
-      - job1
-      - job2:
+      - showinfo
+      - job_store_cache
+      - job_restore_cache:
           requires:
-            - job1
+            - job_store_cache
