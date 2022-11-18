@@ -147,9 +147,13 @@ workflows:
             tags:
               only:
                 - /test\/.*/
+            branches:
+              ignore: /.*/
       - showinfo:
           title: tag-ignore-test
           filters:
             tags:
               ignore:
                 - /test\/.*/
+            branches:
+              ignore: /.*/
