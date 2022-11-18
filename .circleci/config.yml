@@ -27,7 +27,7 @@ jobs:
           name: Generate file
           command: |
             make generate
-            make log VALUE=<< pipeline.id >>-<< pipeline.git.branch >>-<<pipeline.schedule.name>>
+            make log VALUE=<< pipeline.id >>-<< pipeline.git.branch >>-<< pipeline.schedule.name >>-<< pipeline.trigger_source >>
       - check-cwd
       - save_cache:
           # Branch毎 + 各CIワークフロー毎に生成
@@ -60,13 +60,13 @@ jobs:
 
 workflows:
   version: 2
-  cache-control:
+  cache-control-in-workflow:
     jobs:
       - showinfo
       - job_store_cache_in_workflow
       - job_restore_cache_in_workflow:
           requires:
             - job_store_cache_in_workflow
-  cache-restore-previous:
+  cache-restore-previous-run:
     jobs:
       - job_restore_cache_any
