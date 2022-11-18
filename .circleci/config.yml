@@ -21,13 +21,14 @@ jobs:
       - save_cache:
           key: store-{{ .Branch }}
           paths:
-            - dist/*
+            - dist
   job_restore_cache:
     executor: default
     steps:
       - checkout
       - restore_cache:
           key: store-{{ .Branch }}
+      - run: ls -la 
       - run:
           name: check cache file
           command: make check
