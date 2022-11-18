@@ -115,7 +115,9 @@ workflows:
             branches:
               only:
                 - /feature\/.*/
-      - showinfo
+      - showinfo:
+          requires:
+            - run-approval
   approve-ignore-feature:
     jobs:
       - run-approval:
@@ -124,7 +126,9 @@ workflows:
             branches:
               ignore:
                 - /feature\/.*/
-      - showinfo
+      - showinfo:
+          requires:
+            - run-approval
   branch-filter-feature:
     jobs:
       - showinfo:
